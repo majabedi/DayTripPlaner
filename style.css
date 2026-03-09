@@ -32,6 +32,7 @@ body {
 #app {
     display: flex;
     height: 100vh;
+    height: 100dvh;
     width: 100vw;
 }
 
@@ -339,4 +340,62 @@ body {
     font-size: 0.9rem;
     color: #4a4a4a;
     margin-bottom: 4px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    #app {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: 50%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-glass);
+        padding: 15px;
+    }
+    
+    .sidebar-header {
+        margin-bottom: 15px;
+    }
+    
+    .sidebar-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .control-group {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .control-group label {
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
+    
+    .btn {
+        padding: 10px 12px;
+        font-size: 0.95rem;
+    }
+    
+    .btn-accent {
+        padding: 12px 14px;
+        font-size: 1rem;
+    }
+    
+    .map-container {
+        height: 50%;
+        width: 100%;
+        flex-grow: 0;
+    }
+    
+    .tags-container {
+        margin-bottom: 8px;
+    }
+    
+    .tag {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
 }
