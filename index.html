@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Day Planner</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fa-solid fa-map-location-dot"></i> Day Planner</h1>
+                <p>Discover interesting places around you.</p>
+            </div>
+
+            <div class="control-group">
+                <label>1. Set Your Location</label>
+                <button id="btn-geolocation" class="btn btn-primary">
+                    <i class="fa-solid fa-location-crosshairs"></i> Use My Current Location
+                </button>
+                <div class="divider"><span>OR</span></div>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="location-input" placeholder="Search for a city or place...">
+                </div>
+                <button id="btn-search-location" class="btn btn-secondary">Find Location</button>
+                <div id="location-status" class="status-msg"></div>
+            </div>
+
+            <div class="control-group">
+                <label>2. What are you looking for?</label>
+                <p class="help-text">e.g. restaurant, museum, bar, park</p>
+                <div class="tags-container" id="tags-container">
+                    <span class="tag" data-val="restaurant">Restaurant</span>
+                    <span class="tag" data-val="bar">Bar</span>
+                    <span class="tag" data-val="museum">Museum</span>
+                    <span class="tag" data-val="cafe">Cafe</span>
+                    <span class="tag" data-val="park">Park</span>
+                </div>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-tag"></i>
+                    <input type="text" id="keyword-input" placeholder="Add custom keyword & press Enter...">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>3. Search Radius (km)</label>
+                <div class="slider-container">
+                    <input class="styled-slider" type="range" id="radius-slider" min="1" max="20" value="5">
+                    <span id="radius-value">5 km</span>
+                </div>
+            </div>
+
+            <div class="control-group action-group">
+                <button id="btn-find-places" class="btn btn-accent" disabled>
+                    <i class="fa-solid fa-route"></i> Explore Places
+                </button>
+            </div>
+            
+            <div id="results-count" class="results-count"></div>
+        </aside>
+
+        <main class="map-container">
+            <div id="map"></div>
+            <div id="loading-overlay" class="loading-overlay hidden">
+                <div class="loader"></div>
+                <p>Searching for awesome places...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Custom JS -->
+    <script src="app.js"></script>
+</body>
+</html>
