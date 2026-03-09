@@ -307,7 +307,22 @@ btnAiAnalyze.addEventListener('click', async () => {
     
     // We limit to max 30 places to avoid massive context
     const placesToAnalyze = currentPOIs.slice(0, 30);
-    const placesTextList = placesToAnalyze.map(p => `- ${p.name} (${p.type})`).join('\n');
+    const placesTextList = placesToAnalyze.map(p => {
+        let details = `- Name: ${p.name} (Type: ${p.type})`;
+        
+        // Add additional context if available
+        const extraInfo = [];
+        if (p.tags.opening_hours) extraInfo.push(`Hours: ${p.tags.opening_hours}`);
+        if (p.tags.website) extraInfo.push(`Website: ${p.tags.website}`);
+        if (p.tags.wheelchair) extraInfo.push(`Wheelchair Accessible: ${p.tags.wheelchair}`);
+        if (p.tags.fee || p.tags.charge) extraInfo.push(`Fee/Charge: ${p.tags.fee || p.tags.charge}`);
+        if (p.tags.description) extraInfo.push(`Description: ${p.tags.description}`);
+        
+        if (extraInfo.length > 0) {
+            details += `\n  Details: ${extraInfo.join(' | ')}`;
+        }
+        return details;
+    }).join('\n\n');
     
     const prompt = `I am planning a trip with my family. Here is a list of points of interest I found nearby:
 ${placesTextList}
@@ -316,7 +331,7 @@ Please analyze this list and group them into two categories:
 1. "Highly Recommended for Families" 
 2. "Not Recommended or Needs Caution for Families"
 
-For each place, provide a brief (1-2 sentences) reasoning why it belongs in that category. Format your response cleanly with headings.`;
+For each place, provide a brief (1-2 sentences) reasoning why it belongs in that category based on the provided details. Format your response cleanly with headings.`;
 
     const model = aiModelInput.value.trim() || 'gpt-3.5-turbo';
     const baseUrl = aiUrlInput.value.trim().replace(/\/$/, '') || 'https://api.openai.com/v1';
