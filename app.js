@@ -12,6 +12,7 @@ let currentLocation = null; // {lat, lon}
 let userMarker = null;
 let poiMarkers = L.layerGroup().addTo(map);
 let keywords = new Set();
+let currentPOIs = []; // Store the latest fetched POIs for AI analysis
 
 /* Elements */
 const btnGeo = document.getElementById('btn-geolocation');
@@ -24,7 +25,25 @@ const radiusSlider = document.getElementById('radius-slider');
 const radiusValue = document.getElementById('radius-value');
 const btnFind = document.getElementById('btn-find-places');
 const loadingOverlay = document.getElementById('loading-overlay');
+const loadingText = document.getElementById('loading-text');
 const resultsCount = document.getElementById('results-count');
+
+/* AI Elements */
+const aiKeyInput = document.getElementById('ai-key-input');
+const aiUrlInput = document.getElementById('ai-url-input');
+const aiModelInput = document.getElementById('ai-model-input');
+const btnAiAnalyze = document.getElementById('btn-ai-analyze');
+const aiModal = document.getElementById('ai-modal');
+const closeModal = document.getElementById('close-modal');
+const aiResults = document.getElementById('ai-results');
+
+// Modal interactions
+closeModal.addEventListener('click', () => {
+    aiModal.classList.add('hidden');
+});
+aiModal.addEventListener('click', (e) => {
+    if (e.target === aiModal) aiModal.classList.add('hidden');
+});
 
 /* Interactive UI */
 radiusSlider.addEventListener('input', (e) => {
@@ -161,9 +180,12 @@ btnSearch.addEventListener('click', async () => {
 btnFind.addEventListener('click', async () => {
     if (!currentLocation || keywords.size === 0) return;
     
+    loadingText.textContent = "Searching for awesome places...";
     loadingOverlay.classList.remove('hidden');
     resultsCount.textContent = "";
     btnFind.disabled = true;
+    btnAiAnalyze.style.display = 'none';
+    currentPOIs = [];
     
     const radius = parseFloat(radiusSlider.value) * 1000; // in meters
     const {lat, lon} = currentLocation;
@@ -216,6 +238,9 @@ btnFind.addEventListener('click', async () => {
                     else if (tags.shop) type = tags.shop;
                     else if (tags.historic) type = tags.historic;
                     
+                    // Add to currentPOIs for AI
+                    currentPOIs.push({name, type, tags});
+
                     const details = [];
                     if (tags.website) details.push(`<a href="${tags.website}" target="_blank">Website</a>`);
                     if (tags.phone) details.push(`Tel: ${tags.phone}`);
@@ -249,8 +274,12 @@ btnFind.addEventListener('click', async () => {
                 map.fitBounds(L.latLngBounds(bounds).pad(0.1));
             }
             resultsCount.textContent = `Found ${data.elements.length} places!`;
+            
+            // Show AI Analyze button
+            btnAiAnalyze.style.display = 'flex';
         } else {
             resultsCount.textContent = "No places found. Try expanding radius or changing keywords.";
+            btnAiAnalyze.style.display = 'none';
         }
         
     } catch (err) {
@@ -259,5 +288,75 @@ btnFind.addEventListener('click', async () => {
     } finally {
         loadingOverlay.classList.add('hidden');
         checkReady();
+    }
+});
+
+/* AI Analysis Integration */
+btnAiAnalyze.addEventListener('click', async () => {
+    const apiKey = aiKeyInput.value.trim();
+    if (!apiKey) {
+        alert("Please provide an OpenAI API Token first!");
+        return;
+    }
+    
+    // Format POIs for prompt
+    if (currentPOIs.length === 0) {
+        alert("No places found to analyze!");
+        return;
+    }
+    
+    // We limit to max 30 places to avoid massive context
+    const placesToAnalyze = currentPOIs.slice(0, 30);
+    const placesTextList = placesToAnalyze.map(p => `- ${p.name} (${p.type})`).join('\n');
+    
+    const prompt = `I am planning a trip with my family. Here is a list of points of interest I found nearby:
+${placesTextList}
+
+Please analyze this list and group them into two categories:
+1. "Highly Recommended for Families" 
+2. "Not Recommended or Needs Caution for Families"
+
+For each place, provide a brief (1-2 sentences) reasoning why it belongs in that category. Format your response cleanly with headings.`;
+
+    const model = aiModelInput.value.trim() || 'gpt-3.5-turbo';
+    const baseUrl = aiUrlInput.value.trim().replace(/\/$/, '') || 'https://api.openai.com/v1';
+
+    loadingText.textContent = "AI is analyzing the places...";
+    loadingOverlay.classList.remove('hidden');
+
+    try {
+        const response = await fetch(`${baseUrl}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: model,
+                messages: [
+                    { role: "system", content: "You are a helpful travel assistant specializing in family trips." },
+                    { role: "user", content: prompt }
+                ],
+                temperature: 0.7
+            })
+        });
+
+        if (!response.ok) {
+            const errBody = await response.text();
+            throw new Error(`API Error: ${response.status} - ${errBody}`);
+        }
+
+        const data = await response.json();
+        const rawContent = data.choices[0].message.content;
+        
+        // Show result
+        aiResults.innerHTML = `<div class="badge-family">Family Analysis Complete</div><br/>${rawContent}`;
+        aiModal.classList.remove('hidden');
+
+    } catch (error) {
+        console.error("AI Request Failed", error);
+        alert("Failed to analyze with AI. Check console for details.\nError: " + error.message);
+    } finally {
+        loadingOverlay.classList.add('hidden');
     }
 });

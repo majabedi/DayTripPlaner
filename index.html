@@ -61,9 +61,28 @@
                 </div>
             </div>
 
+            <div class="control-group">
+                <label>4. AI Analysis Settings (Optional)</label>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-link"></i>
+                    <input type="text" id="ai-url-input" placeholder="OpenAI Base URL (Default: https://api.openai.com/v1)" value="https://api.openai.com/v1">
+                </div>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="password" id="ai-key-input" placeholder="OpenAI API Key">
+                </div>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-robot"></i>
+                    <input type="text" id="ai-model-input" placeholder="Model (Default: gpt-3.5-turbo)" value="gpt-3.5-turbo">
+                </div>
+            </div>
+
             <div class="control-group action-group">
                 <button id="btn-find-places" class="btn btn-accent" disabled>
                     <i class="fa-solid fa-route"></i> Explore Places
+                </button>
+                <button id="btn-ai-analyze" class="btn btn-primary" style="margin-top: 10px; display: none;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze for Families (AI)
                 </button>
             </div>
             
@@ -74,7 +93,20 @@
             <div id="map"></div>
             <div id="loading-overlay" class="loading-overlay hidden">
                 <div class="loader"></div>
-                <p>Searching for awesome places...</p>
+                <p id="loading-text">Searching for awesome places...</p>
+            </div>
+            
+            <!-- AI Modal -->
+            <div id="ai-modal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Family Suitability Analysis</h2>
+                        <button id="close-modal" class="btn-close"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="ai-results" class="ai-results-content"></div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>

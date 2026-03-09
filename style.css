@@ -342,6 +342,103 @@ body {
     margin-bottom: 4px;
 }
 
+/* Modal Styling */
+.modal {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: opacity 0.3s ease;
+}
+
+.modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90%;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--secondary-hover);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-glass);
+}
+
+.modal-header h2 {
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.btn-close:hover {
+    color: var(--accent-color);
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text-main);
+}
+
+.ai-results-content {
+    white-space: pre-wrap; /* For Markdown-like spacing */
+}
+
+/* AI badge */
+.badge-family {
+    display: inline-block;
+    background: #e0fbfc;
+    color: #0077b6;
+    padding: 10px 15px;
+    border-radius: var(--radius-md);
+    margin-bottom: 15px;
+    font-weight: 600;
+    border: 1px solid #caf0f8;
+}
+
+.badge-warning {
+    display: inline-block;
+    background: #fff3cd;
+    color: #856404;
+    padding: 10px 15px;
+    border-radius: var(--radius-md);
+    margin-bottom: 15px;
+    font-weight: 600;
+    border: 1px solid #ffeeba;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     #app {
