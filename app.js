@@ -29,9 +29,6 @@ const loadingText = document.getElementById('loading-text');
 const resultsCount = document.getElementById('results-count');
 
 /* AI Elements */
-const aiKeyInput = document.getElementById('ai-key-input');
-const aiUrlInput = document.getElementById('ai-url-input');
-const aiModelInput = document.getElementById('ai-model-input');
 const btnAiAnalyze = document.getElementById('btn-ai-analyze');
 const aiModal = document.getElementById('ai-modal');
 const closeModal = document.getElementById('close-modal');
@@ -300,12 +297,6 @@ btnFind.addEventListener('click', async () => {
 
 /* AI Analysis Integration */
 btnAiAnalyze.addEventListener('click', async () => {
-    const apiKey = aiKeyInput.value.trim();
-    if (!apiKey) {
-        alert("Please provide an OpenAI API Token first!");
-        return;
-    }
-    
     // Format POIs for prompt
     if (currentPOIs.length === 0) {
         alert("No places found to analyze!");
@@ -330,38 +321,18 @@ btnAiAnalyze.addEventListener('click', async () => {
         }
         return details;
     }).join('\n\n');
-    
-    const prompt = `I am planning a trip with my family. Here is a list of points of interest I found nearby:
-${placesTextList}
-
-Please analyze this list and perform the following tasks:
-1. Identify the TOP 10 most family-friendly locations from this list.
-2. For these Top 10 locations ONLY, provide a detailed (1-3 sentences) explanation of why it is suitable for families based STRICTLY on the provided details. 
-3. DO NOT mention or list any places outside of the Top 10.
-4. If information (like hours or wheelchair access) is marked as "N/A" or missing, DO NOT mention it at all. Only discuss the positive aspects you know for sure.
-
-Format your response cleanly with markdown headings for each of the Top 10 places. Do not include an "Other Mentions" section.`;
-
-    const model = aiModelInput.value.trim() || 'gpt-3.5-turbo';
-    const baseUrl = aiUrlInput.value.trim().replace(/\/$/, '') || 'https://api.openai.com/v1';
 
     loadingText.textContent = "AI is analyzing the places...";
     loadingOverlay.classList.remove('hidden');
 
     try {
-        const response = await fetch(`${baseUrl}/chat/completions`, {
+        const response = await fetch('/api/analyze', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: model,
-                messages: [
-                    { role: "system", content: "You are a helpful travel assistant specializing in family trips." },
-                    { role: "user", content: prompt }
-                ],
-                temperature: 0.7
+                placesTextList: placesTextList
             })
         });
 
@@ -371,7 +342,7 @@ Format your response cleanly with markdown headings for each of the Top 10 place
         }
 
         const data = await response.json();
-        const rawContent = data.choices[0].message.content;
+        const rawContent = data.content;
         
         // Show result
         aiResults.innerHTML = `<div class="badge-family">Family Analysis Complete</div><br/>${rawContent}`;
@@ -387,40 +358,19 @@ Format your response cleanly with markdown headings for each of the Top 10 place
 
 /* Explain Single POI via AI */
 window.explainPoiWithAI = async (encodedContext) => {
-    const apiKey = aiKeyInput.value.trim();
-    if (!apiKey) {
-        alert("Please provide an OpenAI API Token in the AI Settings first!");
-        return;
-    }
-
     const context = decodeURIComponent(encodedContext);
-    
-    const prompt = `I am considering visiting a specific place with my family. Here are the details about the location:
-
-${context}
-
-Explain how family-friendly this location is based on these details. Consider aspects like the type of place, potential accessibility, and general expectations for a family visit. Keep your response to 2-3 sentences.`;
-
-    const model = aiModelInput.value.trim() || 'gpt-3.5-turbo';
-    const baseUrl = aiUrlInput.value.trim().replace(/\/$/, '') || 'https://api.openai.com/v1';
 
     loadingText.textContent = "AI is thinking...";
     loadingOverlay.classList.remove('hidden');
 
     try {
-        const response = await fetch(`${baseUrl}/chat/completions`, {
+        const response = await fetch('/api/explain', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: model,
-                messages: [
-                    { role: "system", content: "You are a helpful travel assistant specializing in family trips." },
-                    { role: "user", content: prompt }
-                ],
-                temperature: 0.7
+                context: context
             })
         });
 
@@ -430,7 +380,7 @@ Explain how family-friendly this location is based on these details. Consider as
         }
 
         const data = await response.json();
-        const rawContent = data.choices[0].message.content;
+        const rawContent = data.content;
         
         // Show result
         aiResults.innerHTML = `<div class="badge-family">Specific Space Details</div><br/>${rawContent}`;

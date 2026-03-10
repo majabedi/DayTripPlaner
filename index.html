@@ -68,20 +68,9 @@
             </div>
 
             <div class="control-group">
-                <label>4. AI Analysis Settings (Optional)</label>
-                <div class="input-with-icon">
-                    <i class="fa-solid fa-link"></i>
-                    <input type="text" id="ai-url-input" placeholder="OpenAI Base URL (Default: https://api.openai.com/v1)" value="https://api.openai.com/v1">
-                </div>
-                <div class="input-with-icon">
-                    <i class="fa-solid fa-key"></i>
-                    <input type="password" id="ai-key-input" placeholder="OpenAI API Key">
-                </div>
-                <div class="input-with-icon">
-                    <i class="fa-solid fa-robot"></i>
-                    <input type="text" id="ai-model-input" placeholder="Model (Default: gpt-3.5-turbo)" value="gpt-3.5-turbo">
-                </div>
-                <!-- The AI analyze button belongs inside the AI section and gets hidden when no places are found -->
+                <label>4. AI Settings</label>
+                <p class="help-text">Using secure Vercel backend integration</p>
+                <!-- The AI analyze button belongs inside this section and gets shown when places are found -->
                 <button id="btn-ai-analyze" class="btn btn-primary" style="margin-top: 15px; display: none;">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze for Families (AI)
                 </button>
