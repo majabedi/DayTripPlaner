@@ -30,13 +30,13 @@ export default async function handler(req, res) {
 ${placesTextList}
 
 Analyze this list and execute these instructions EXACTLY:
-1. Output ONLY the TOP 10 most family-friendly locations. If there are fewer than 10, output all of them.
-2. For each location, provide EXACTLY 2 to 3 sentences explaining why it is suitable for families based STRICTLY on the provided details.
-3. DO NOT output any introductory text (e.g., "Here are the top 10...").
-4. DO NOT output any concluding text or outro.
-5. DO NOT mention or list any places outside of the Top 10.
+1. Output ONLY the TOP 10 most family-friendly locations. If there are fewer than 10 total places, just output the ones that exist. DO NOT complain or mention that there are fewer than 10.
+2. "Family-friendly" means: Parks, museums, cafes, restaurants, historical sites, and leisure activities are highly rated. Bars, pubs, nightclubs, or adult-only venues should be excluded or ranked lowest. Places with wheelchair/stroller access are a major plus.
+3. For each location, provide EXACTLY 2 to 3 sentences explaining why it is suitable for families based STRICTLY on the provided details. Be creative but accurate; for example, if it's a park, mention it's great for kids to burn off energy.
+4. DO NOT output your thought process (e.g., "Since there are only 5...", or "The instruction is ambiguous..."). 
+5. DO NOT output any introductory text or concluding text. 
 6. DO NOT mention missing information or "N/A" values.
-7. Format your response strictly as a Markdown list with headings for each place.
+7. Format your response strictly as a Markdown list with headings (###) for each place.
 
 Go directly into the list of the top locations now.`;
 
