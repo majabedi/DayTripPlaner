@@ -334,12 +334,13 @@ btnAiAnalyze.addEventListener('click', async () => {
     const prompt = `I am planning a trip with my family. Here is a list of points of interest I found nearby:
 ${placesTextList}
 
-Please analyze this comprehensive list and perform the following tasks:
-1. Sort ALL of these points of interest from most family-friendly to least family-friendly.
-2. For the TOP 10 most family-friendly locations only, provide a detailed (1-3 sentences) explanation of why it is suitable for families based on the provided details (like hours, type, wheelchair access).
-3. Briefly list the remaining places in a "Other Mentions" section.
+Please analyze this list and perform the following tasks:
+1. Identify the TOP 10 most family-friendly locations from this list.
+2. For these Top 10 locations ONLY, provide a detailed (1-3 sentences) explanation of why it is suitable for families based STRICTLY on the provided details. 
+3. DO NOT mention or list any places outside of the Top 10.
+4. If information (like hours or wheelchair access) is marked as "N/A" or missing, DO NOT mention it at all. Only discuss the positive aspects you know for sure.
 
-Format your response cleanly with markdown headings, but ensure the Top 10 are clearly highlighted.`;
+Format your response cleanly with markdown headings for each of the Top 10 places. Do not include an "Other Mentions" section.`;
 
     const model = aiModelInput.value.trim() || 'gpt-3.5-turbo';
     const baseUrl = aiUrlInput.value.trim().replace(/\/$/, '') || 'https://api.openai.com/v1';
