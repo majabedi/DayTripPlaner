@@ -242,12 +242,14 @@ btnFind.addEventListener('click', async () => {
                     currentPOIs.push({name, type, tags});
 
                     const details = [];
+                    if (tags.description) details.push(`<b>About:</b> ${tags.description}`);
                     if (tags.website) details.push(`<a href="${tags.website}" target="_blank">Website</a>`);
                     if (tags.phone) details.push(`Tel: ${tags.phone}`);
                     if (tags.opening_hours) details.push(`Hours: ${tags.opening_hours}`);
                     
-                    // Build AI Details object
-                    const aiContextString = `Name: ${name}\nType: ${type}\n${details.join('\n')}`;
+                    // Build AI context and pre-encode it to avoid inline escaping issues
+                    const aiContextString = `Name: ${name}\nType: ${type}\nDescription: ${tags.description || 'N/A'}\nHours: ${tags.opening_hours || 'N/A'}\nWebsite: ${tags.website || 'N/A'}`;
+                    const encodedCtx = encodeURIComponent(aiContextString);
                     const popupHTML = `
                         <div class="popup-title">${name}</div>
                         <div class="popup-type">${type}</div>
@@ -255,7 +257,7 @@ btnFind.addEventListener('click', async () => {
                         <button class="btn btn-primary" style="padding: 5px; font-size: 0.8rem; margin-top: 8px;" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${elLat},${elLon}')">
                             <i class="fa-solid fa-directions"></i> Get Directions
                         </button>
-                        <button class="btn btn-secondary" style="padding: 5px; font-size: 0.8rem; margin-top: 5px;" onclick="window.explainPoiWithAI(encodeURIComponent('${aiContextString.replace(/'/g, "\\'")}'))">
+                        <button class="btn btn-secondary" style="padding: 5px; font-size: 0.8rem; margin-top: 5px;" onclick="window.explainPoiWithAI('${encodedCtx}')">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> AI Explain Space
                         </button>
                     `;
