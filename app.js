@@ -246,12 +246,17 @@ btnFind.addEventListener('click', async () => {
                     if (tags.phone) details.push(`Tel: ${tags.phone}`);
                     if (tags.opening_hours) details.push(`Hours: ${tags.opening_hours}`);
                     
+                    // Build AI Details object
+                    const aiContextString = `Name: ${name}\nType: ${type}\n${details.join('\n')}`;
                     const popupHTML = `
                         <div class="popup-title">${name}</div>
                         <div class="popup-type">${type}</div>
                         ${details.length > 0 ? `<div class="popup-detail">${details.join('<br>')}</div>` : ''}
                         <button class="btn btn-primary" style="padding: 5px; font-size: 0.8rem; margin-top: 8px;" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${elLat},${elLon}')">
                             <i class="fa-solid fa-directions"></i> Get Directions
+                        </button>
+                        <button class="btn btn-secondary" style="padding: 5px; font-size: 0.8rem; margin-top: 5px;" onclick="window.explainPoiWithAI(encodeURIComponent('${aiContextString.replace(/'/g, "\\'")}'))">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Explain Space
                         </button>
                     `;
                     
@@ -327,11 +332,12 @@ btnAiAnalyze.addEventListener('click', async () => {
     const prompt = `I am planning a trip with my family. Here is a list of points of interest I found nearby:
 ${placesTextList}
 
-Please analyze this list and group them into two categories:
-1. "Highly Recommended for Families" 
-2. "Not Recommended or Needs Caution for Families"
+Please analyze this comprehensive list and perform the following tasks:
+1. Sort ALL of these points of interest from most family-friendly to least family-friendly.
+2. For the TOP 10 most family-friendly locations only, provide a detailed (1-3 sentences) explanation of why it is suitable for families based on the provided details (like hours, type, wheelchair access).
+3. Briefly list the remaining places in a "Other Mentions" section.
 
-For each place, provide a brief (1-2 sentences) reasoning why it belongs in that category based on the provided details. Format your response cleanly with headings.`;
+Format your response cleanly with markdown headings, but ensure the Top 10 are clearly highlighted.`;
 
     const model = aiModelInput.value.trim() || 'gpt-3.5-turbo';
     const baseUrl = aiUrlInput.value.trim().replace(/\/$/, '') || 'https://api.openai.com/v1';
@@ -375,3 +381,62 @@ For each place, provide a brief (1-2 sentences) reasoning why it belongs in that
         loadingOverlay.classList.add('hidden');
     }
 });
+
+/* Explain Single POI via AI */
+window.explainPoiWithAI = async (encodedContext) => {
+    const apiKey = aiKeyInput.value.trim();
+    if (!apiKey) {
+        alert("Please provide an OpenAI API Token in the AI Settings first!");
+        return;
+    }
+
+    const context = decodeURIComponent(encodedContext);
+    
+    const prompt = `I am considering visiting a specific place with my family. Here are the details about the location:
+
+${context}
+
+Explain how family-friendly this location is based on these details. Consider aspects like the type of place, potential accessibility, and general expectations for a family visit. Keep your response to 2-3 sentences.`;
+
+    const model = aiModelInput.value.trim() || 'gpt-3.5-turbo';
+    const baseUrl = aiUrlInput.value.trim().replace(/\/$/, '') || 'https://api.openai.com/v1';
+
+    loadingText.textContent = "AI is thinking...";
+    loadingOverlay.classList.remove('hidden');
+
+    try {
+        const response = await fetch(`${baseUrl}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: model,
+                messages: [
+                    { role: "system", content: "You are a helpful travel assistant specializing in family trips." },
+                    { role: "user", content: prompt }
+                ],
+                temperature: 0.7
+            })
+        });
+
+        if (!response.ok) {
+            const errBody = await response.text();
+            throw new Error(`API Error: ${response.status} - ${errBody}`);
+        }
+
+        const data = await response.json();
+        const rawContent = data.choices[0].message.content;
+        
+        // Show result
+        aiResults.innerHTML = `<div class="badge-family">Specific Space Details</div><br/>${rawContent}`;
+        aiModal.classList.remove('hidden');
+
+    } catch (error) {
+        console.error("Single AI Request Failed", error);
+        alert("Failed to query AI for this point. Check console for details.\nError: " + error.message);
+    } finally {
+        loadingOverlay.classList.add('hidden');
+    }
+};
