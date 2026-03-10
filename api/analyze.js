@@ -29,13 +29,16 @@ export default async function handler(req, res) {
         const prompt = `I am planning a trip with my family. Here is a list of points of interest I found nearby:
 ${placesTextList}
 
-Please analyze this list and perform the following tasks:
-1. Identify the TOP 10 most family-friendly locations from this list.
-2. For these Top 10 locations ONLY, provide a detailed (1-3 sentences) explanation of why it is suitable for families based STRICTLY on the provided details. 
-3. DO NOT mention or list any places outside of the Top 10.
-4. If information (like hours or wheelchair access) is marked as "N/A" or missing, DO NOT mention it at all. Only discuss the positive aspects you know for sure.
+Analyze this list and execute these instructions EXACTLY:
+1. Output ONLY the TOP 10 most family-friendly locations. If there are fewer than 10, output all of them.
+2. For each location, provide EXACTLY 2 to 3 sentences explaining why it is suitable for families based STRICTLY on the provided details.
+3. DO NOT output any introductory text (e.g., "Here are the top 10...").
+4. DO NOT output any concluding text or outro.
+5. DO NOT mention or list any places outside of the Top 10.
+6. DO NOT mention missing information or "N/A" values.
+7. Format your response strictly as a Markdown list with headings for each place.
 
-Format your response cleanly with markdown headings for each of the Top 10 places. Do not include an "Other Mentions" section.`;
+Go directly into the list of the top locations now.`;
 
         const completion = await openai.chat.completions.create({
             model: modelName,
