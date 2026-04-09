@@ -1,4 +1,81 @@
+/* Onboarding Setup */
+let travelGroup = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+    const membersList = document.getElementById('members-list');
+    const btnAddMember = document.getElementById('btn-add-member');
+    const btnStartExploring = document.getElementById('btn-start-exploring');
+    const onboarding = document.getElementById('onboarding');
+    const appContainer = document.getElementById('app');
+
+    function createMemberForm() {
+        const div = document.createElement('div');
+        div.className = 'control-group member-form';
+        div.innerHTML = `
+            <div style="display: flex; gap: 15px; margin-bottom: 15px; padding-right: 60px;">
+                <div style="flex: 1;">
+                    <label>Age</label>
+                    <input type="number" class="member-age form-input-styled" placeholder="e.g. 30" min="0" max="120">
+                </div>
+                <div style="flex: 1;">
+                    <label>Sex</label>
+                    <select class="member-sex form-input-styled">
+                        <option value="Not Specified">Select...</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label>Interests</label>
+                <input type="text" class="member-interests form-input-styled" placeholder="e.g. History, Food, Parks">
+            </div>
+            <button class="btn btn-remove-member"><i class="fa-solid fa-trash"></i></button>
+        `;
+
+        div.querySelector('.btn-remove-member').addEventListener('click', () => {
+            div.remove();
+        });
+
+        membersList.appendChild(div);
+    }
+
+    if (membersList) {
+        createMemberForm();
+        btnAddMember.addEventListener('click', createMemberForm);
+        btnStartExploring.addEventListener('click', () => {
+            travelGroup = [];
+            document.querySelectorAll('.member-form').forEach(form => {
+                const age = form.querySelector('.member-age').value;
+                const sex = form.querySelector('.member-sex').value;
+                const interests = form.querySelector('.member-interests').value;
+                
+                if (age || interests || sex !== 'Not Specified') {
+                    travelGroup.push({
+                        age: age || 'Unknown',
+                        sex: sex,
+                        interests: interests || 'None specified'
+                    });
+                }
+            });
+
+            if (travelGroup.length === 0) {
+                travelGroup.push({ age: 'Unknown', sex: 'Not Specified', interests: 'General' }); // Default minimum group array
+            }
+
+            onboarding.style.display = 'none';
+            appContainer.style.display = 'flex';
+            
+            if (typeof map !== 'undefined' && map !== null) {
+                setTimeout(() => map.invalidateSize(), 200);
+            }
+        });
+    }
+});
+
 /* Map Initialization */
+
 const map = L.map('map').setView([51.505, -0.09], 13); // Default London
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -332,7 +409,8 @@ btnAiAnalyze.addEventListener('click', async () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                placesTextList: placesTextList
+                placesTextList: placesTextList,
+                travelGroup: travelGroup
             })
         });
 

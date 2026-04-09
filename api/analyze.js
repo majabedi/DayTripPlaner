@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { placesTextList } = req.body;
+        const { placesTextList, travelGroup } = req.body;
 
         if (!placesTextList) {
             return res.status(400).json({ error: 'placesTextList is required' });
@@ -26,17 +26,24 @@ export default async function handler(req, res) {
             baseURL: apiUrl,
         });
 
-        const prompt = `I am planning a trip with my family. Here is a list of points of interest I found nearby:
+        let groupInfoStr = "Unknown group";
+        if (travelGroup && travelGroup.length > 0) {
+            groupInfoStr = travelGroup.map(m => `- Age: ${m.age}, Sex: ${m.sex}, Interests: ${m.interests}`).join('\n');
+        }
+
+        const prompt = `I am planning a trip. Here is the profile of the people traveling with me:
+${groupInfoStr}
+
+Here is a list of points of interest I found nearby:
 ${placesTextList}
 
 Analyze this list and execute these instructions EXACTLY:
-1. Output ONLY the TOP 10 most family-friendly locations. If there are fewer than 10 total places, just output the ones that exist. DO NOT complain or mention that there are fewer than 10.
-2. "Family-friendly" means: Parks, museums, cafes, restaurants, historical sites, and leisure activities are highly rated. Bars, pubs, nightclubs, or adult-only venues should be excluded or ranked lowest. Places with wheelchair/stroller access are a major plus.
-3. For each location, provide EXACTLY 2 to 3 sentences explaining why it is suitable for families based STRICTLY on the provided details. Be creative but accurate; for example, if it's a park, mention it's great for kids to burn off energy.
-4. DO NOT output your thought process (e.g., "Since there are only 5...", or "The instruction is ambiguous..."). 
-5. DO NOT output any introductory text or concluding text. 
-6. DO NOT mention missing information or "N/A" values.
-7. Format your response strictly as a Markdown list with headings (###) for each place.
+1. Output ONLY the TOP 10 most suitable locations tailored to my travel group's age, sex, and interests. If there are fewer than 10 total places, just output the ones that exist. DO NOT complain or mention that there are fewer than 10.
+2. For each location, provide EXACTLY 2 to 3 sentences explaining why it is suitable for my specific group based STRICTLY on the provided details of the place and our group profile. Be creative but accurate.
+3. DO NOT output your thought process (e.g., "Since there are only 5...", or "The instruction is ambiguous..."). 
+4. DO NOT output any introductory text or concluding text. 
+5. DO NOT mention missing information or "N/A" values.
+6. Format your response strictly as a Markdown list with headings (###) for each place.
 
 Go directly into the list of the top locations now.`;
 

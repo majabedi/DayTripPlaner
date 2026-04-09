@@ -16,7 +16,27 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
+    <div id="onboarding" class="onboarding-container">
+        <div class="onboarding-card">
+            <img src="Hodora.png" alt="Hodora Logo" class="brand-logo-large">
+            <h2>Welcome to Hodora</h2>
+            <p>Define the group traveling with you to get personalized AI suggestions!</p>
+            
+            <div id="members-list">
+                <!-- Member forms will be added here -->
+            </div>
+            
+            <button id="btn-add-member" class="btn btn-secondary" style="margin-bottom: 20px;">
+                <i class="fa-solid fa-plus"></i> Add Group Member
+            </button>
+            
+            <button id="btn-start-exploring" class="btn btn-accent" style="width: 100%; font-size: 1.2rem;">
+                Start Exploring <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="app" style="display: none;">
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h1><img src="Hodora.png" alt="Hodora Logo" class="brand-logo"> Hodora</h1>
