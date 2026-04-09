@@ -66,6 +66,12 @@ body {
     margin-bottom: 5px;
 }
 
+.brand-logo {
+    max-height: 48px;
+    width: auto;
+    object-fit: contain;
+}
+
 .sidebar-header p {
     color: var(--text-muted);
     font-size: 0.95rem;
