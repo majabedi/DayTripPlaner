@@ -284,7 +284,11 @@ btnFind.addEventListener('click', async () => {
     try {
         const res = await fetch("https://overpass-api.de/api/interpreter", {
             method: "POST",
-            body: query
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `data=${encodeURIComponent(query)}`
         });
         
         const data = await res.json();
