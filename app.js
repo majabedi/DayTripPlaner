@@ -282,14 +282,17 @@ btnFind.addEventListener('click', async () => {
     `;
     
     try {
-        const res = await fetch("https://overpass-api.de/api/interpreter", {
+        const res = await fetch("/api/overpass", {
             method: "POST",
             headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/x-www-form-urlencoded"
+                "Content-Type": "application/json"
             },
-            body: `data=${encodeURIComponent(query)}`
+            body: JSON.stringify({ query: query })
         });
+        
+        if (!res.ok) {
+            throw new Error(`Server returned ${res.status}`);
+        }
         
         const data = await res.json();
         
